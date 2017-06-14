@@ -1,0 +1,1 @@
+var smtpMailer = angular.module('smtpMailer', []);
