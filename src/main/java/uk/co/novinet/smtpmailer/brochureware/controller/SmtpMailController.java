@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController()
-public class SendSmtpMailController {
+public class SmtpMailController {
 
     @Value("${FAKE_SMTP_HOST}")
     private String fakeSmtpHost;
@@ -46,14 +46,13 @@ public class SendSmtpMailController {
 			transport = session.getTransport("smtp");
 			transport.connect(fakeSmtpHost, smtpMailBean.getUsername(), smtpMailBean.getPassword());
 			transport.sendMessage(message, message.getAllRecipients());
-
+			result.put("success", true);
+			return result;
 		} finally {
 			if (transport != null) {
 				transport.close();
 			}
 		}
-		result.put("success", true);
-		return result;
 	}
 
 	private MimeMessage buildMessage(SmtpMailBean smtpMailBean, Session session) throws MessagingException, AddressException {
