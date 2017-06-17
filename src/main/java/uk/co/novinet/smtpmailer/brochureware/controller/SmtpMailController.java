@@ -1,6 +1,7 @@
 package uk.co.novinet.smtpmailer.brochureware.controller;
 
 import static java.util.UUID.randomUUID;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +19,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,8 @@ import uk.co.novinet.smtpmailer.brochureware.DictionaryReservoirSampler;
 
 @RestController()
 public class SmtpMailController {
+	
+	private static Log LOGGER = LogFactory.getLog(SmtpMailController.class);
 
     @Value("${FAKE_SMTP_HOST}")
     private String fakeSmtpHost;
@@ -57,6 +61,9 @@ public class SmtpMailController {
 			transport.sendMessage(message, message.getAllRecipients());
 			result.put("success", true);
 			return result;
+		} catch (Exception e) {
+			LOGGER.error("Could not send message", e);
+			throw new RuntimeException(e);
 		} finally {
 			if (transport != null) {
 				transport.close();
@@ -72,7 +79,7 @@ public class SmtpMailController {
 		smtpMailBean.setFromAddress(dictionaryReservoirSampler.randomEmailAddress());
 		smtpMailBean.setToAddress(dictionaryReservoirSampler.randomEmailAddress());
 		smtpMailBean.setPlainContent(dictionaryReservoirSampler.randomSentences(4));
-		smtpMailBean.setSubject(WordUtils.capitalize(dictionaryReservoirSampler.chooseWord()));
+		smtpMailBean.setSubject(dictionaryReservoirSampler.randomSentences(1));
 		return smtpMailBean;
 	}
 	
@@ -93,9 +100,11 @@ public class SmtpMailController {
 	}
 
 	private void addContentToMultipart(Multipart multipart, String contentType, String contentString) throws MessagingException {
-		MimeBodyPart bodyPart = new MimeBodyPart();
-		bodyPart.setContent(contentString, contentType);
-		multipart.addBodyPart(bodyPart);
+		if (isNotBlank(contentString)) {
+			MimeBodyPart bodyPart = new MimeBodyPart();
+			bodyPart.setContent(contentString, contentType);
+			multipart.addBodyPart(bodyPart);
+		}
 	}
 
 	private Properties buildSmtpProperties(SmtpMailBean smtpMailBean) {
