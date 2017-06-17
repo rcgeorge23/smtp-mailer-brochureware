@@ -15,3 +15,10 @@
 .box > .icon > .info > .more a { font-family: "Roboto",sans-serif !important; font-size: 12px; color: #222; line-height: 12px; text-transform: uppercase; text-decoration: none; }
 .box > .icon:hover > .info > .more > a { color: #fff; padding: 6px 8px; background-color: #18BC9C; }
 .box .space { height: 30px; }
+
+.authentication-group {
+    border: #eee;
+    border-style: solid;
+    padding-bottom: 15px;
+    border-width: thin;
+}

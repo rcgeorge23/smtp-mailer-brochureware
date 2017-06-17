@@ -1,9 +1,12 @@
 package uk.co.novinet.smtpmailer.brochureware.controller;
 
+import static java.util.UUID.randomUUID;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.annotation.Resource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -15,11 +18,14 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import uk.co.novinet.smtpmailer.brochureware.DictionaryReservoirSampler;
 
 @RestController()
 public class SmtpMailController {
@@ -29,8 +35,11 @@ public class SmtpMailController {
 
     @Value("${FAKE_SMTP_PORT}")
     private String fakeSmtpPort;
+    
+	@Resource
+	DictionaryReservoirSampler dictionaryReservoirSampler;
 
-	@RequestMapping(value="/sendSmtpMail", method=RequestMethod.POST)
+	@RequestMapping(value="/sendSmtpMail", method = RequestMethod.POST)
 	public Map<String, Boolean> sendSmtpMail(@RequestBody SmtpMailBean smtpMailBean) throws AddressException, MessagingException {
 		Properties smtpProperties = buildSmtpProperties(smtpMailBean);
 
@@ -53,6 +62,22 @@ public class SmtpMailController {
 				transport.close();
 			}
 		}
+	}
+	
+	@RequestMapping(value="/getSmtpMailBean", method = RequestMethod.GET)
+	public SmtpMailBean getSmtpMailBean() {
+		SmtpMailBean smtpMailBean = new SmtpMailBean();
+		smtpMailBean.setUsername(guid());
+		smtpMailBean.setPassword(guid());
+		smtpMailBean.setFromAddress(dictionaryReservoirSampler.randomEmailAddress());
+		smtpMailBean.setToAddress(dictionaryReservoirSampler.randomEmailAddress());
+		smtpMailBean.setPlainContent(dictionaryReservoirSampler.randomSentences(4));
+		smtpMailBean.setSubject(WordUtils.capitalize(dictionaryReservoirSampler.chooseWord()));
+		return smtpMailBean;
+	}
+	
+	private String guid() {
+		return randomUUID().toString().replaceAll("-", "");
 	}
 
 	private MimeMessage buildMessage(SmtpMailBean smtpMailBean, Session session) throws MessagingException, AddressException {

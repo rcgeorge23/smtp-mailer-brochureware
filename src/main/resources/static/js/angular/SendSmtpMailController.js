@@ -1,15 +1,11 @@
 angular.module('smtpMailer', []).controller('SendSmtpMailController', function($scope, $http) {
-	$scope.smtpMailContent = {
-		username: "my-username",
-		password: "my-password",
-		fromAddress: "sender@email.com",
-		toAddress: "recipient@email.com",
-		subject: "Really Important Email",
-		plainContent: "This is a really important message!",
-		htmlContent: "This is a <strong>really important</strong> message!"
-	};
 	
-	console.debug("hello", $scope.smtpMailContent);
+	$http.get('/getSmtpMailBean').then(function(response) {
+		$scope.smtpMailContent = response.data;
+		console.log("hello", $scope.smtpMailContent);
+	}, function() {
+		alert('error');
+	});
 	
 	$scope.send = function() {
 		var data = {
