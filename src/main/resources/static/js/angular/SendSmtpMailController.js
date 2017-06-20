@@ -24,7 +24,7 @@ angular.module('smtpMailer', []).controller('SendSmtpMailController', function($
 		};
 		
 		$http.post('/sendSmtpMail', data).then(function() {
-			alert('success');
+//			alert('success');
 		}, function() {
 			alert('error');
 		});
@@ -42,6 +42,4 @@ angular.module('smtpMailer', []).controller('SendSmtpMailController', function($
 			}
 		);
 	};
-	
-	$scope.test = 'hello';
 });
