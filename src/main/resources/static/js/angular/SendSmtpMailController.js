@@ -31,7 +31,7 @@ angular.module('smtpMailer', []).controller('SendSmtpMailController', function($
 	};
 	
 	$scope.getMessage = function() {
-		$http.get('http://' + $scope.smtpConfiguration.fakeSmtpHost, {params: {
+		$http.get('/getJsonSmtpMail', {params: {
 			username: $scope.smtpMailContent.username,
 			password: $scope.smtpMailContent.password,
 			toAddress: $scope.smtpMailContent.toAddress}}).then(function(response) {
@@ -42,4 +42,6 @@ angular.module('smtpMailer', []).controller('SendSmtpMailController', function($
 			}
 		);
 	};
+	
+	$scope.test = 'hello';
 });

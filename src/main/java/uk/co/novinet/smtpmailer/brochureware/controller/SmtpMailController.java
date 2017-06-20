@@ -1,11 +1,15 @@
 package uk.co.novinet.smtpmailer.brochureware.controller;
 
+import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -84,23 +88,47 @@ public class SmtpMailController {
     		@RequestParam("password") String password, 
     		@RequestParam("toAddress") String toAddress) throws Exception {
 		
-		HttpURLConnection con = (HttpURLConnection) smtpMailUrlBuilder.build(username, password, toAddress).openConnection();
+		URL url = smtpMailUrlBuilder.build(username, password, toAddress);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 		con.setRequestMethod("GET");
 
 		con.setRequestProperty("User-Agent", "SMTPBoxBrochureware");
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
+		InputStream inputStream = null;
+		BufferedReader in = null;
+		
+		try {
+			inputStream = con.getInputStream();
+		
+			in = new BufferedReader(new InputStreamReader(inputStream));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+	
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			
+			in.close();
+	
+			return response.toString();
+		} catch (IOException e) {
+			LOGGER.error(format("Could not open connection to %s", url), e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (Exception ignored) { }
+			}
+			
+			if (in != null) {
+				try {
+					in.close();
+				} catch (Exception ignored) { }
+			}			
 		}
 		
-		in.close();
-
-		return response.toString();
+		return null;
 	}
 	
 	@RequestMapping(value="/getSmtpMailBean", method = RequestMethod.GET)

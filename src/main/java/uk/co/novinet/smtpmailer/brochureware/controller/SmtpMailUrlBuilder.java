@@ -17,16 +17,19 @@ public class SmtpMailUrlBuilder {
     public URL build(String username, String password, String toAddress) throws Exception {
     	StringBuilder sb = new StringBuilder();
     	
-    	appendParameter(sb, "username", username);
-    	appendParameter(sb, "password", password);
-    	appendParameter(sb, "toAddress", toAddress);
+    	appendParameter(sb, "username", username, false);
+    	appendParameter(sb, "password", password, false);
+    	appendParameter(sb, "toAddress", toAddress, true);
 
-    	return new URI("http", fakeSmtpHost, "/", sb.toString()).toURL();
+    	return new URI("http", fakeSmtpHost, "/", sb.toString(), null).toURL();
     }
 
-	private void appendParameter(StringBuilder sb, String parameterName, String parameterValue) throws UnsupportedEncodingException {
-		sb.append(URLEncoder.encode(parameterName, "UTF-8"));
+	private void appendParameter(StringBuilder sb, String parameterName, String parameterValue, boolean isLast) throws UnsupportedEncodingException {
+		sb.append(parameterName);
     	sb.append('=');
-    	sb.append(URLEncoder.encode(parameterValue, "UTF-8"));
+    	sb.append(parameterValue);
+    	if (!isLast) {
+    		sb.append('&');
+    	}
 	}
 }

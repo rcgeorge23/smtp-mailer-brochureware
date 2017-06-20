@@ -23,3 +23,6 @@
     border-width: thin;
 }
 
+pre.response-pre {
+	height: 400px;
+}
