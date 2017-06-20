@@ -8,7 +8,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>Fake SMTP Server</title>
+    <title>smtptrap</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -44,7 +44,7 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="#page-top">Fake SMTP Server</a>
+                <a class="navbar-brand" href="#page-top">SMTP Trap</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -76,9 +76,15 @@
                 <div class="col-lg-12">
                 	<i class="fa fa-envelope-o big-icon" aria-hidden="true"></i>
                     <div class="intro-text">
-                        <h1 class="name">Fake SMTP Server</h1>
+                        <h1 class="name">SMTP Trap</h1>
                         <hr class="star-light" />
-                        <span class="skills">A simple and free fake SMTP server to use when automation testing your application</span>
+                        <span class="skills">A simple and free fake SMTP server to use when automation testing your application.</span>
+                        <br/>
+                        <br/>
+                        <span class="skills">No signup required.</span>
+                        <br/>
+                        <br/>
+                        <span class="skills">Start using immediately.</span>
                     </div>
                 </div>
             </div>
@@ -86,7 +92,7 @@
     </header>
     
 
-    <section id="showMe">
+    <section id="showMe" ng-controller="SendSmtpMailController">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -95,9 +101,18 @@
                 </div>
             </div>
             <div class="row">
+            	<div class="col-lg-10">
+            		<div class="row">
+						<div class="col-md-offset-3 col-md-9">
+	     					<h3>1. Send an email</h3>
+	     				</div>
+     				</div>
+            	</div>
+            </div>
+            <div class="row">
                 <div class="col-lg-10">
-                    <form ng-controller="SendSmtpMailController" class="form-horizontal" novalidate="novalidate">
-                    	<fieldset class="">
+                    <form class="form-horizontal" novalidate="novalidate">
+                    	<fieldset>
 							<div class="form-group control-group">
 								<div class="col-md-offset-3 col-md-9">
 									<div class="row authentication-group">
@@ -152,7 +167,33 @@
                     </form>
                 </div>
             </div>
+            <div class="row">
+            	<div class="col-lg-10">
+            		<div class="row">
+						<div class="col-md-offset-3 col-md-9">
+	     					<h3>2. Now get the message as JSON</h3>
+	     				</div>
+     				</div>
+            	</div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10">
+					<div class="col-md-offset-3 col-md-9">
+						<div class="row">
+							<pre>{{$scope.jsonMessage}}</pre>
+						</div>
+					</div>
+            	</div>
+            </div>                        
         </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h3></h3>
+                    <button type="submit" class="btn btn-success btn-lg" ng-click="getMessage()">Send</button>
+                </div>
+            </div>
+		</div>
     </section>
 
 

@@ -1,8 +1,13 @@
 angular.module('smtpMailer', []).controller('SendSmtpMailController', function($scope, $http) {
 	
+	$http.get('/getConfiguration').then(function(response) {
+		$scope.smtpConfiguration = response.data;
+	}, function() {
+		alert('error');
+	});
+	
 	$http.get('/getSmtpMailBean').then(function(response) {
 		$scope.smtpMailContent = response.data;
-		console.log("hello", $scope.smtpMailContent);
 	}, function() {
 		alert('error');
 	});
@@ -23,5 +28,18 @@ angular.module('smtpMailer', []).controller('SendSmtpMailController', function($
 		}, function() {
 			alert('error');
 		});
+	};
+	
+	$scope.getMessage = function() {
+		$http.get('http://' + $scope.smtpConfiguration.fakeSmtpHost, {params: {
+			username: $scope.smtpMailContent.username,
+			password: $scope.smtpMailContent.password,
+			toAddress: $scope.smtpMailContent.toAddress}}).then(function(response) {
+				console.log('response', response);
+				$scope.jsonMessage = response.data;
+			}, function() {
+				alert('error');
+			}
+		);
 	};
 });

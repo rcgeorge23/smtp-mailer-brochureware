@@ -3,6 +3,9 @@ package uk.co.novinet.smtpmailer.brochureware.controller;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -25,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.co.novinet.smtpmailer.brochureware.DictionaryReservoirSampler;
@@ -41,7 +45,10 @@ public class SmtpMailController {
     private String fakeSmtpPort;
     
 	@Resource
-	DictionaryReservoirSampler dictionaryReservoirSampler;
+	private DictionaryReservoirSampler dictionaryReservoirSampler;
+	
+	@Resource
+	private SmtpMailUrlBuilder smtpMailUrlBuilder;
 
 	@RequestMapping(value="/sendSmtpMail", method = RequestMethod.POST)
 	public Map<String, Boolean> sendSmtpMail(@RequestBody SmtpMailBean smtpMailBean) throws AddressException, MessagingException {
@@ -71,6 +78,31 @@ public class SmtpMailController {
 		}
 	}
 	
+	@RequestMapping(value="/getJsonSmtpMail", method = RequestMethod.GET)
+	public String getJsonSmtpMail(
+			@RequestParam("username") String username, 
+    		@RequestParam("password") String password, 
+    		@RequestParam("toAddress") String toAddress) throws Exception {
+		
+		HttpURLConnection con = (HttpURLConnection) smtpMailUrlBuilder.build(username, password, toAddress).openConnection();
+
+		con.setRequestMethod("GET");
+
+		con.setRequestProperty("User-Agent", "SMTPBoxBrochureware");
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		
+		in.close();
+
+		return response.toString();
+	}
+	
 	@RequestMapping(value="/getSmtpMailBean", method = RequestMethod.GET)
 	public SmtpMailBean getSmtpMailBean() {
 		SmtpMailBean smtpMailBean = new SmtpMailBean();
@@ -81,6 +113,14 @@ public class SmtpMailController {
 		smtpMailBean.setPlainContent(dictionaryReservoirSampler.randomSentences(4));
 		smtpMailBean.setSubject(dictionaryReservoirSampler.randomSentences(1));
 		return smtpMailBean;
+	}
+	
+	@RequestMapping(value="/getConfiguration", method = RequestMethod.GET)
+	public Map<String, String> getConfiguration() {
+		Map<String, String> result = new HashMap<>();
+		result.put("fakeSmtpHost", fakeSmtpHost);
+		result.put("fakeSmtpPort", fakeSmtpPort);
+		return result;
 	}
 	
 	private String guid() {
